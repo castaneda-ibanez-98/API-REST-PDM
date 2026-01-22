@@ -5,14 +5,14 @@ export const getUsers = async(req,res)=>{
     res.json(users);
 }
 export const getUser = async(req,res)=>{
-const user = await User.getById(req.param.id);
+const user = await User.getById(req.params.id);
 if(!user) return res.status(404).json({message:"usuario no encontrado"});
 res.json(user);
 };
 
 
 export const getUserByEmail = async(req,res)=>{
-    const user = await User.getByEmail(req.param.correo)
+    const user = await User.getByEmail(req.params.correo)
 if(!user) return res.status(404).json({message:"usuario no encontrado"});
 res.json(user);
 }
@@ -24,7 +24,7 @@ export const createUser = async(req,res)=>{
 
 export const updateUser = async(req,res)=>{
     await User.update(req.params.id,req.body);
-    res.json({message:"usuario actualizada"});
+    res.json({message:"usuario actualizado"});
 };
 
 export const deleteUser=async(req,res)=>{

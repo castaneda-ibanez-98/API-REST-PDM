@@ -9,6 +9,14 @@ export const login = async (req, res) => {
   const { correo, contrasena} = req.body;
 
   const user  = await User.getByEmail(correo);
+  
+  
+  // 1. PRIMERO verificamos si el usuario existe
+  if (!user) {
+    return res.status(401).json({ message: "Usuario no encontrado" });
+  }
+ // 2. DESPUÉS podemos hacer logs o comparar la contraseña
+  console.log("Validando usuario:", user.correo);
 
   if (!user) {
     return res.status(401).json({ message: "Usuario no encontrado" });
