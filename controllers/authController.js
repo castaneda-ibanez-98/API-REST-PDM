@@ -6,7 +6,9 @@ dotenv.config();
 
 
 export const login = async (req, res) => {
-  const { correo, contrasena} = req.body;
+ const { correo, contrasena } = req.body ?? {};
+if (!correo || !contrasena)
+  return res.status(400).json({ message: "correo y contrasena son requeridos" });
 
   const user  = await User.getByEmail(correo);
   

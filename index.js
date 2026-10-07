@@ -14,5 +14,17 @@ app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("API Tasks funcionando ✅"));
 
+/*bloque que envia errores*/ 
+app.use((req, res) => res.status(404).json({ message: "Ruta no encontrada" }));
+app.use((err, req, res, next) => {
+  console.error(err);
+  if (err.code === "ER_DUP_ENTRY")
+    return res.status(409).json({ message: "Registro duplicado" });
+  if (err.code === "ER_ROW_IS_REFERENCED_2" || err.code === "ER_NO_REFERENCED_ROW_2")
+    return res.status(409).json({ message: "La operación viola una relación entre datos" });
+  res.status(500).json({ message: "Error interno del servidor" });
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

@@ -22,7 +22,7 @@ export const getTask = async (req, res) => {
 
 export const createTask = async (req, res) => {
   const userId = req.user.id
-  const newTask = await Task.create(userId);
+  const newTask = await Task.create(req.body,userId);
   res.status(201).json(newTask);
 };
 
@@ -33,6 +33,7 @@ export const updateTask = async (req, res) => {
 };
 
 export const deleteTask = async (req, res) => {
+  const userId =req.user.id
   await Task.delete(req.params.id,userId);
   res.json({ message: "Tarea eliminada" });
 };
@@ -47,36 +48,23 @@ export const syncTasks = async (req, res) => {
   const serverUpdates = [];
   const conflicts = [];
 
-  for (const clientTask of clientTasks) {
-    const serverTask = await Task.getById(clientTask.id, userId);
+ if (!Array.isArray(req.body))
+  return res.status(400).json({ message: "Se esperaba un arreglo de tareas" });
 
-    if (!serverTask) {
-      const created = await Task.create(clientTask, userId);
-      serverUpdates.push(created);
-      continue;
-    }
+for (const clientTask of req.body) {
+  const serverTask = await Task.getById(clientTask.id, userId);
 
-    if (serverTask.updatedAt !== clientTask.updatedAt) {
-      conflicts.push({
-        client: clientTask,
-        server: serverTask
-      });
-      continue;
-    }
+  if (!serverTask) {                                  // nueva (id temporal negativo)
+    const created = await Task.create(clientTask, userId);
+    serverUpdates.push({ ...created, tempId: clientTask.id });
+  } else if (clientTask.updatedAt > serverTask.updatedAt) {
+    await Task.update(serverTask.id, clientTask, userId);       // gana el cliente
+  } else if (clientTask.updatedAt < serverTask.updatedAt) {
+    conflicts.push({ client: clientTask, server: serverTask }); // gana el servidor
+  }                                                   // iguales: nada que hacer
+}
 
-    if (!serverTask) {
-      const created = await Task.create(clientTask, userId);
-      serverUpdates.push({ 
-          ...created, 
-          tempId: clientTask.id
-      });
-      continue;
-    }
-
-    await Task.update(serverTask.id, clientTask, userId);
-  }
-
-  const lastSync = req.body.lastSync ?? 0;
+const lastSync = Number(req.query.lastSync ?? 0);
   const updatedOnServer = await Task.getUpdatedAfter(userId, lastSync);
 
   serverUpdates.push(...updatedOnServer);

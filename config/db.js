@@ -7,6 +7,8 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  typeCast: (field, next) =>
+  field.type === "TINY" && field.length === 1 ? field.string() === "1" : next(),
 });
  
 export default pool;

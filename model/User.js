@@ -53,5 +53,10 @@ export class User{
         await pool.query("DELETE FROM user WHERE id = ?",[id])
     }
 
+static async setPassword(id, hash) {
+  await pool.query("UPDATE user SET contrasena=? WHERE id=?", [hash, id]);
+}
+
+
 
 }
