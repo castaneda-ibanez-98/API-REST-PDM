@@ -1,0 +1,6 @@
+PORT=3306
+DB_HOST=b7qosvrx3c7u7wbumozi-mysql.services.clever-cloud.com
+DB_USER=umf6wbpo5tc61ypw
+DB_PASSWORD=umf6wbpo5tc61ypw
+DB_NAME=b7qosvrx3c7u7wbumozi
+JWT_SECRET=supersecreto
