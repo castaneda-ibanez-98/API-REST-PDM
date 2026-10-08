@@ -20,7 +20,7 @@ router.get("/id/:id",verifyToken,getUser);
 
 //nuevo
 router.put("/:id/updatePassword", verifyToken, updatePassword);
-router.put("/:id/forgotPassword", verifyToken, forgotPassword);
+//router.put("/:id/forgotPassword", verifyToken, forgotPassword);
 
 router.put("/:id",verifyToken,updateUser);
 router.delete("/:id",verifyToken,deleteUser);

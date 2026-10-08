@@ -11,8 +11,6 @@ if (!correo || !contrasena)
   return res.status(400).json({ message: "correo y contrasena son requeridos" });
 
   const user  = await User.getByEmail(correo);
-  
-  
   // 1. PRIMERO verificamos si el usuario existe
   if (!user) {
     return res.status(401).json({ message: "Usuario no encontrado" });
@@ -35,4 +33,33 @@ if (!correo || !contrasena)
       boleta:user.boleta,
       carrera:user.carrera,
     } });
+};
+
+/*peticion de correo electronico*/
+export const forgotCheckEmail = async (req, res) => {
+  const { correo } = req.body ?? {};
+  if (!correo) return res.status(400).json({ message: "Falta el correo" });
+  const user = await User.getByEmail(correo);
+  if (!user) return res.status(404).json({ message: "El correo no está registrado" });
+  res.json({ message: "ok" });
+};
+/*confirmacion de la boleta*/
+export const forgotCheckBoleta = async (req, res) => {
+  const { correo, boleta } = req.body ?? {};
+  if (!correo || !boleta) return res.status(400).json({ message: "Faltan campos" });
+  const user = await User.getByEmail(correo);
+  if (!user || user.boleta !== boleta)
+    return res.status(401).json({ message: "La boleta no coincide" });
+  res.json({ message: "ok" });
+};
+/*reseteando contrasena*/ 
+export const forgotReset = async (req, res) => {
+  const { correo, boleta, newPassword } = req.body ?? {};
+  if (!correo || !boleta || !newPassword)
+    return res.status(400).json({ message: "Faltan campos" });
+  const user = await User.getByEmail(correo);
+  if (!user || user.boleta !== boleta)
+    return res.status(401).json({ message: "Correo o boleta incorrectos" });
+  await User.setPassword(user.id, await bcrypt.hash(newPassword, 10));
+  res.json({ message: "Contraseña restablecida" });
 };

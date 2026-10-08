@@ -26,5 +26,18 @@ app.use((err, req, res, next) => {
 });
 
 
+/*
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+*/
+
+
+/*a continuacion cambios para vercel */
+// Condicionamos el puerto para que solo funcione en local (fuera de Vercel)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+}
+
+// EXPORTACIÓN OBLIGATORIA PARA VERCEL
+export default app;
